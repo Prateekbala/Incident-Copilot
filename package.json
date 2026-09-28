@@ -1,0 +1,48 @@
+{
+  "name": "incident-copilot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n worker,web -c yellow,cyan \"npm:dev:worker\" \"npm:dev:web\"",
+    "dev:offline": "concurrently -k -n worker,web -c yellow,cyan \"npm:dev:worker:offline\" \"npm:dev:web\"",
+    "dev:worker": "wrangler dev --port 8787",
+    "dev:worker:offline": "wrangler dev --local --port 8787 --var WAIT_FOR_EFFECT:\"5 seconds\"",
+    "dev:web": "vite",
+    "smoke": "node scripts/smoke-ws.mjs",
+    "build": "vite build",
+    "preview": "npm run build && wrangler dev --port 8787",
+    "deploy": "npm run build && wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply incident-copilot --local",
+    "db:migrate:remote": "wrangler d1 migrations apply incident-copilot --remote",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p web/tsconfig.json && tsc --noEmit -p evals/tsconfig.json",
+    "test": "vitest run --config vitest.config.ts",
+    "eval": "tsx evals/cli.ts",
+    "eval:offline": "tsx evals/cli.ts --mode offline",
+    "eval:chaos": "tsx evals/cli.ts --mode chaos",
+    "eval:live": "tsx evals/cli.ts --mode live --record --judge --trials 3",
+    "eval:replay": "tsx evals/cli.ts --mode replay --judge --trials 3",
+    "eval:judge-calibration": "tsx evals/calibrate-judge.ts"
+  },
+  "dependencies": {
+    "hono": "^4.13.10",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260928.1",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^4.0.0",
+    "wrangler": "^4.143.0"
+  }
+}
